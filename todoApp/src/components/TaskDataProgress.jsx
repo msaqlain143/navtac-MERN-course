@@ -1,16 +1,18 @@
-import React from 'react'
+import React from "react";
 
-const TaskDataProgress = () => {
+const TaskDataProgress = ({ progress }) => {
   return (
-    <div>
-        <div className="radial-progress text-primary" style={{ "--value": 70 } /* as React.CSSProperties */ } aria-valuenow={70} role="progressbar">
-  70%
-</div>
-<div className="radial-progress text-primary" style={{ "--value": 70 } /* as React.CSSProperties */ } aria-valuenow={70} role="progressbar">
-  70%
-</div>
+    <div className="flex flex-col items-center space-y-6 my-8">
+      <div
+        className="radial-progress text-primary border-4 border-blue-500 rounded-full"
+        style={{ "--value": progress } /* as React.CSSProperties */}
+        aria-valuenow={progress}
+        role="progressbar"
+      >
+        {progress}%
+      </div>
     </div>
-  )
-}
+  );
+};
 
-export default TaskDataProgress
+export default TaskDataProgress;
