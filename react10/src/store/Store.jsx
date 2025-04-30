@@ -2,10 +2,12 @@
 
 import { configureStore } from "@reduxjs/toolkit";
 import CounterReducer from "./CounterSlice/CounterSlice.jsx";
+import ProductReducer from "./ProductSlice/ProductSlice.jsx";
 
 const store = configureStore({
   reducer: {
-    Counter: CounterReducer, //{value:0}
+    Counter: CounterReducer,
+    products: ProductReducer, //{value:0}
   },
 });
 
