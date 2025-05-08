@@ -1,15 +1,11 @@
 import { Router } from "express";
-import {
-  getUser,
-  getLogin,
-  getRegister,
-} from "../controllers/user.controller.js";
+import { registerUser, userLogin } from "../controllers/user.controller.js";
+import m1 from "../middleware/m1.middleware.js";
+import m2 from "../middleware/m2.niddleware.js";
 
 const router = Router();
 
-router.route("/get-user").get(getUser);
-router.route("/user-register").post(getRegister);
-router.route("/user-login").get(getLogin);
-router.route;
+router.route("/register").get(m1, m2, registerUser);
+router.route("/login").get(userLogin);
 
 export default router;

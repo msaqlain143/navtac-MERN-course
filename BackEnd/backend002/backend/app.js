@@ -6,6 +6,10 @@ import dotenv from "dotenv";
 
 const app = express();
 
+//
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
 //cors <cross origin resource sharing>
 // app.use(
 //   cors({

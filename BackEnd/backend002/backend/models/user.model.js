@@ -1,4 +1,5 @@
 import mongoose, { Schema } from "mongoose";
+import bcrypt from "bcryptjs";
 
 const UserSchema = new Schema(
   {
@@ -19,4 +20,20 @@ const UserSchema = new Schema(
 );
 
 //model
-const user = mongoose.model("user", UserSchema);
+
+//bcrypt a password
+
+UserSchema.pre("save", async function () {
+  if (!this.isModified("password")) {
+    return;
+  }
+  try {
+    const salt = await bcrypt.genSalt(10);
+    this.password = await bcrypt.hash(this.password, salt);
+  } catch (error) {
+    throw Error("Password Encrypt Failed ! ");
+  }
+});
+
+const User = mongoose.model("user", UserSchema);
+export default User;
