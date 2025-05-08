@@ -22,7 +22,7 @@ function App() {
 
   return (
     <>
-      <h1>App Data</h1>
+      <h1>Full Stack Development Practice :</h1>
     </>
   );
 }
