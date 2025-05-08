@@ -35,5 +35,14 @@ UserSchema.pre("save", async function () {
   }
 });
 
+//cpmpared hash and password
+UserSchema.methods.comparedPassword = async function (enterPassword) {
+  try {
+    return await bcrypt.compare(enterPassword, this.password);
+  } catch (error) {
+    throw new Error("Password Compared Failed");
+  }
+};
+
 const User = mongoose.model("user", UserSchema);
 export default User;

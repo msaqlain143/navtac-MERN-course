@@ -26,7 +26,28 @@ async function registerUser(req, res, next) {
 }
 
 async function userLogin(req, res, next) {
-  console.log("login function");
+  const { email, password } = req.body;
+  //check
+  if (!password || !email) {
+    return res.json({ message: "All Fileds Are Required !" });
+  }
+
+  //user get
+  const user = await User.findone({ email: email });
+  if (!user) {
+    return req.json({ message: "User Not Found !" });
+  }
+
+  //verify password
+  const isVerify = await user.comparePassword(password);
+  if (!isVerify) {
+    return res.status(400).json({ message: "Password is Invalid" });
+  }
+
+  return req.json({
+    message: " User Login Successfully",
+    user: user,
+  });
 }
 
 export { registerUser, userLogin };
