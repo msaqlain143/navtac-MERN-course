@@ -4,25 +4,24 @@ import viteLogo from "/vite.svg";
 import "./App.css";
 
 function App() {
-  const [count, setCount] = useState(0);
-
-  fetch("http://localhost:4040/data")
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
-      return response.json();
+  useEffect(() => {
+    fetch("http://localhost:8080/api/v1/user/delete", {
+      method: "POST",
+      credentials: "include",
     })
-    .then((data) => {
-      console.log(data); // Handle the data received from the backend
-    })
-    .catch((error) => {
-      console.error("There was a problem with the fetch operation:", error);
-    });
-
+      .then((res) => {
+        return res.json();
+      })
+      .then((data) => {
+        console.log(data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, []);
   return (
     <>
-      <h1>Full Stack Development Practice :</h1>
+      <Login />
     </>
   );
 }

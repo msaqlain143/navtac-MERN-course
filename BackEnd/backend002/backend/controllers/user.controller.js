@@ -5,6 +5,7 @@
 //database integration
 
 import User from "../models/user.model.js";
+import jwt from "jsonwebtoken";
 
 async function registerUser(req, res, next) {
   //get values
@@ -44,10 +45,33 @@ async function userLogin(req, res, next) {
     return res.status(400).json({ message: "Password is Invalid" });
   }
 
+  const token = user.generateToken();
+
+  res.cookie("token", token, {
+    httpOnly: true,
+    secure: false,
+    maxAge: 1000 * 60 * 60 * 24 * 15,
+    sameSite: "none",
+  });
+
   return req.json({
     message: " User Login Successfully",
     user: user,
   });
 }
+//del user
+async function delUser(req, res, next) {
+  const { email } = req.user;
 
-export { registerUser, userLogin };
+  const user = await User.findOne({ email });
+  if (!user) {
+    return res.status(400).json({ message: "User not found" });
+  }
+
+  res.json({
+    message: "user data",
+    user,
+  });
+}
+
+export { registerUser, userLogin, delUser };

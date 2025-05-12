@@ -44,5 +44,6 @@ UserSchema.methods.comparedPassword = async function (enterPassword) {
   }
 };
 
+UserSchema.methods.genrateToken = function () {};
 const User = mongoose.model("user", UserSchema);
 export default User;
