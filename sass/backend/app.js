@@ -1,27 +1,23 @@
-import express from "express";
-import cookie from "cookie-parser";
-import cors from "cors";
 import cookieParser from "cookie-parser";
-
+import express from "express";
+import cors from "cors";
 const app = express();
 
-//middleware implement
-// json in builb global middleware
-
+// middlewares implement
+// json <in build global middleware>
 app.use(express.json());
 
-//urlencoded
+// urlencoded <inbuild middleware>
 app.use(express.urlencoded({ extended: true }));
 
-//cors middleware
-
-const whiteList = [];
+// cors middleware  <third party middleware  global>
+const whiteList = ["http://localhost:5174", "http://localhost:5173"];
 const corsOptions = {
   origin: function (origin, cb) {
     if (whiteList.includes(origin) || !origin) {
       cb(null, true);
     } else {
-      cb(new Error("Not allowed by cors "));
+      cb(new Error("Not allowed by cors"));
     }
   },
   credentials: true,
@@ -30,16 +26,16 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
-//cookie parser
-
+// cookie parser  <third party middleware global >
 app.use(cookieParser());
 
-// routes
-import OwnerRouter from "./src/routes/owner/Owner.route.js";
-app.use("/api/v1/owner", OwnerRouter);
+// ouner route setup
+import ownerRouter from "./src/routes/owner/owner.route.js";
+app.use("/api/v1/owner", ownerRouter);
 
-//erro middleware
+// error middleware
 import errorMiddleware from "./src/middleware/Error.middleware.js";
 app.use(errorMiddleware);
 
+// export app
 export default app;

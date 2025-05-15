@@ -1,12 +1,19 @@
 async function errorMiddleware(err, req, res, next) {
-  const statusCode = err.statusCode || 500;
-  const message = err.message || "Somthing Went Wrong";
+  let statusCode = err.statusCode || 500;
+  let message = err.message || "Something went wrong";
+
+  //    hanlde duplicate key error
+  if (err.code === 11000) {
+    (message = "Duplicate key error "), (statusCode = 409);
+  }
 
   res.status(statusCode).json({
     message: message,
     statusCode: statusCode,
-    date: err.data,
+    data: err.data,
   });
 }
 
 export default errorMiddleware;
+
+// {message:"dsdsa" , statuscode:202  , data :"dad"}
