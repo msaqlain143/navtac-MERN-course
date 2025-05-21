@@ -16,7 +16,7 @@ const RegisterForm = () => {
     address: "",
     contactNumber: "",
     type: "",
-    profile:undefined ,
+    profile: undefined,
   });
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
@@ -44,14 +44,14 @@ const RegisterForm = () => {
   // hanlde register
 
   function handleSubmit() {
-    const avalialbleFormData =  new FormData()
+    const avalialbleFormData = new FormData();
     for (const key in formData) {
       if (formData[key]) {
         avalialbleFormData.append(key, formData[key]);
       }
     }
     setLoading(true);
-    fetch("http://localhost:7070/api/v1/owner/register", {
+    fetch("http://localhost:8000/api/v1/owner/register", {
       method: "POST",
       // headers: {
       //   "Content-Type": "application/json",

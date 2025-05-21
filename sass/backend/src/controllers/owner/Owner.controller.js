@@ -9,6 +9,7 @@ import generateOTP from "../../utils/generateOtp.js";
 import Otp from "../../models/otp/otp.models.js";
 import sendEmail from "../../utils/sedEmail.js";
 import cleanOtp from "../../helpers/CleanOtp.js";
+import { inflateRaw } from "zlib";
 // const registerOwner =async function(req,res,next){
 //     throw new CustomError("this is my cutom error" , 404 , {data:null})
 // }
@@ -221,4 +222,38 @@ const imageUpload = AsyncHandler(async (req, res, next) => {
     status: 1,
   });
 });
-export { registerOwner, verifyOtp, resendOtp, imageUpload };
+
+// login user
+const loginUser = AsyncHandler(async (req, res, next) => {
+  const { email, password } = req.body;
+
+  // check email and password
+  if (!email || !password) {
+    return next(new CustomError("Email and password are required", 404));
+  }
+  //checl email
+  const isEmailExist = await Owner.findOne(email);
+  if (!isEmailExist) {
+    return next(new CustomError("Email not found", 404));
+  }
+
+  //` check password
+  const isPasswordMatched = await isEmailExist.comparePassword(password);
+  if (!isPasswordMatched) {
+    return next(new CustomError("Email or Password is Incorrect", 404));
+  }
+
+  // check user is verify or not
+  if (!isEmailExist.isVerify) {
+    return next(new CustomError("User not verify", 401));
+  }
+  // check user is blocked or not
+
+  //login user
+  res.json({
+    status: 1,
+    message: "Login successfully",
+    data: { user: isEmailExist },
+  });
+});
+export { registerOwner, verifyOtp, resendOtp, imageUpload, loginUser };
