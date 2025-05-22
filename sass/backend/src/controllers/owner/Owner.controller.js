@@ -8,8 +8,10 @@ import multer from "multer";
 import generateOTP from "../../utils/generateOtp.js";
 import Otp from "../../models/otp/otp.models.js";
 import sendEmail from "../../utils/sedEmail.js";
+import chalk from "chalk";
 import cleanOtp from "../../helpers/CleanOtp.js";
 import { inflateRaw } from "zlib";
+import path from "path";
 // const registerOwner =async function(req,res,next){
 //     throw new CustomError("this is my cutom error" , 404 , {data:null})
 // }
@@ -247,13 +249,48 @@ const loginUser = AsyncHandler(async (req, res, next) => {
   if (!isEmailExist.isVerify) {
     return next(new CustomError("User not verify", 401));
   }
-  // check user is blocked or not
+
+  // generate token
+  const token = isEmailExist.generateToken();
+  console.log(chalk.green.bold("JWT TOKEN ", token));
+
+  if (!token) {
+    return next(new CustomError("Token not generated", 500));
+  }
+
+  res.cookie("token", token, {
+    httpOnly: true,
+    expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), //7 days
+    secure: false,
+    sameSite: "none",
+    path: "/",
+    expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+  });
 
   //login user
+  res.json(
+    {
+      status: 1,
+      message: "Login successfully",
+      data: { user: isEmailExist },
+    },
+    token
+  );
+});
+
+// user me
+const me = AsyncHandler(async (req, res, next) => {
+  const { email } = req.user;
+  const isUserExist = await Owner.findOne({ email });
+  if (!isUserExist) {
+    return next(new CustomError("User not found", 404));
+  }
+
   res.json({
     status: 1,
-    message: "Login successfully",
-    data: { user: isEmailExist },
+    message: "your profile object",
+    data: isUserExist,
   });
 });
-export { registerOwner, verifyOtp, resendOtp, imageUpload, loginUser };
+
+export { registerOwner, verifyOtp, resendOtp, imageUpload, loginUser, me };

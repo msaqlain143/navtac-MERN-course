@@ -1,6 +1,7 @@
 import mongoose, { Schema } from "mongoose";
 import bcrypt from "bcryptjs";
 import CustomError from "../../utils/CustomError.js";
+import jwt from "jsonwebtoken";
 const ownerSchema = new Schema(
   {
     fullName: {
@@ -63,6 +64,17 @@ ownerSchema.methods.comparePassword = async function (password) {
   } catch (error) {
     throw new CustomError("Password comparison failed", 500, { error });
   }
+};
+
+// generate jwt token
+ownerSchema.methods.generateToken = function () {
+  return jwt.sign(
+    { id: this._id, email: this.email },
+    process.env.JWT_SECRET_KEY,
+    {
+      expiresIn: process.env.JWT_EXPIRATION_TIME,
+    }
+  );
 };
 
 const Owner = mongoose.model("owner", ownerSchema);

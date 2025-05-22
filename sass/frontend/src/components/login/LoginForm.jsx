@@ -1,8 +1,12 @@
-import React from "react";
+import React, { useContext } from "react";
 import logo from "/logo.png";
 import { toast } from "react-hot-toast";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { AuthContext } from "../../authContext/AuthContext.jsx";
+
 const LoginForm = () => {
+  const navigate = useNavigate();
+  const { handleLogin } = useContext(AuthContext);
   function handleSubmit(e) {
     e.preventDefault();
     const formData = new FormData(e.target);
@@ -14,31 +18,13 @@ const LoginForm = () => {
       return;
     }
 
-    fetch("http://localhost:8000/api/v1/owner/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        email,
-        password,
-      }),
-    })
-      .then(async (res) => {
-        const data = await res.json();
-        if (!res.ok) {
-          toast.error(data.message || "Something went wrong");
-          return;
-        }
-        return data;
+    handleLogin(email, password)
+      .then(() => {
+        toast.success("Login successful");
+        navigate("/owner/dashboard"); // Update path to match your routes
       })
-      .then((data) => {
-        if (data?.status === 1) {
-          toast.success("Login successfuly");
-        }
-      })
-      .catch((err) => {
-        toast.error(err.message || "Something went wrong");
+      .catch((error) => {
+        toast.error(error.message || "Login failed");
       });
   }
 
