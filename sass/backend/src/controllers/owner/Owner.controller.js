@@ -232,7 +232,7 @@ const loginUser = AsyncHandler(async (req, res, next) => {
     return next(new CustomError("Email and password are required", 404));
   }
   //checl email
-  const isEmailExist = await Owner.findOne(email);
+  const isEmailExist = await Owner.findOne({ email });
   if (!isEmailExist) {
     return next(new CustomError("Email not found", 404));
   }

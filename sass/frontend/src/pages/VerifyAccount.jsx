@@ -17,7 +17,7 @@ const VerifyAccount = () => {
       return;
     }
 
-    fetch("http://localhost:7070/api/v1/owner/resend-otp", {
+    fetch("http://localhost:8000/api/v1/owner/resend-otp", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -91,7 +91,7 @@ const VerifyAccount = () => {
     }
 
     // fetch
-    fetch("http://localhost:7070/api/v1/owner/verify-otp", {
+    fetch("http://localhost:8000/api/v1/owner/verify-otp", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
