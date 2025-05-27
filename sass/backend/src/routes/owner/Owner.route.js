@@ -6,6 +6,7 @@ import {
   imageUpload,
   loginUser,
   me,
+  refresh,
 } from "../../controllers/owner/Owner.controller.js";
 import upload from "../../middleware/multer.middleware.js";
 import verifyToken from "../../middleware/verifyToken.middleware.js";
@@ -17,5 +18,6 @@ router.route("/login").post(loginUser);
 router.route("/resend-otp").post(resendOtp);
 router.route("/me").get(verifyToken, me);
 router.route("/upload").post(upload.single("profile"), imageUpload);
+router.route("/refresh").get(refresh);
 
 export default router;

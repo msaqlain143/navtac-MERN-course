@@ -1,13 +1,14 @@
 import React, { useContext } from "react";
 import logo from "/logo.png";
 import { toast } from "react-hot-toast";
-import { Link, useNavigate } from "react-router-dom";
-import { AuthContext } from "../../authContext/AuthContext.jsx";
-
+import { Link, useNavigate } from "react-router";
+import { AuthContext } from "../../authContext/AuthContext";
+import axios from "axios";
 const LoginForm = () => {
+  const { setAuth } = useContext(AuthContext);
   const navigate = useNavigate();
-  const { handleLogin } = useContext(AuthContext);
-  function handleSubmit(e) {
+
+  async function handleSubmit(e) {
     e.preventDefault();
     const formData = new FormData(e.target);
     const email = formData.get("email");
@@ -18,14 +19,34 @@ const LoginForm = () => {
       return;
     }
 
-    handleLogin(email, password)
-      .then(() => {
-        toast.success("Login successful");
-        navigate("/owner/dashboard"); // Update path to match your routes
-      })
-      .catch((error) => {
-        toast.error(error.message || "Login failed");
-      });
+    // axios
+    // axios.get("url" , {body} ,  {headers / credencials })
+    try {
+      const res = await axios.post(
+        "http://localhost:8000/api/v1/owner/login",
+        { email, password },
+        {
+          withCredentials: true,
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      if (res.data.status === 1) {
+        toast.success("login successfully");
+        setAuth((prev) => {
+          return {
+            ...prev,
+            accessToken: res?.data?.accessToken,
+            user: res?.data?.data?.user,
+          };
+        });
+        localStorage.setItem("persist", true);
+        navigate("/owner/dashboard");
+      }
+    } catch (error) {
+      console.log(error, "Error logging in");
+    }
   }
 
   return (

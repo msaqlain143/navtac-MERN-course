@@ -41,6 +41,10 @@ const ownerSchema = new Schema(
       type: String,
       default: "free",
     },
+    refreshToken: {
+      type: String,
+      default: null,
+    },
   },
   { timestamps: true }
 );
