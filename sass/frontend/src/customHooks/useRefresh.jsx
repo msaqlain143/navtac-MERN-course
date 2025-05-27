@@ -2,7 +2,7 @@ import { useContext } from "react";
 import { AuthContext } from "../authContext/AuthContext";
 import axios from "axios";
 function useRefresh() {
-  const { setAuth } = useContext(AuthContext);
+  const { setAuth, persist } = useContext(AuthContext);
   return async function refresh() {
     try {
       const res = await axios.get(
@@ -11,6 +11,10 @@ function useRefresh() {
       );
 
       if (res?.data?.status === 1) {
+        if (!persist) {
+          console.log("persist", persist);
+          return;
+        }
         setAuth((prev) => {
           return {
             ...prev,
