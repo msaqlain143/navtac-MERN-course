@@ -6,6 +6,7 @@ import emailHtmlTemplate from "../../utils/emailHTMLTemplat.js";
 import uploadImage from "../../utils/cloudinary.js";
 import multer from "multer";
 import generateOTP from "../../utils/generateOtp.js";
+import principalWelcomeEmailTemplate from "../../utils/principalEmailTemplate.js";
 import Otp from "../../models/otp/otp.models.js";
 import sendEmail from "../../utils/sedEmail.js";
 import chalk from "chalk";
@@ -13,6 +14,7 @@ import cleanOtp from "../../helpers/CleanOtp.js";
 import jwt from "jsonwebtoken";
 import generateRefreshToken from "../../utils/generateRefreshToken.js";
 import { inflateRaw } from "zlib";
+import { AsyncResource } from "async_hooks";
 import path from "path";
 // const registerOwner =async function(req,res,next){
 //     throw new CustomError("this is my cutom error" , 404 , {data:null})
@@ -368,6 +370,103 @@ const refresh = AsyncHandler(async (req, res, next) => {
   }
 });
 
+// logout
+
+const logout = AsyncHandler(async (req, res, next) => {
+  const user = req?.user;
+  if (!user) {
+    return next(new CustomError("User not found", 404));
+  }
+
+  //  search user in database
+  const isUserExist = await Owner.findOne({ email: user.email });
+
+  if (!isUserExist) {
+    return next(new CustomError("User not found", 404));
+  }
+
+  //  null refresh token field in db
+  isUserExist.refreshToken = null;
+  await isUserExist.save();
+
+  // clear cookies
+  res.clearCookie("refresh", {
+    httpOnly: true,
+    secure: true,
+    sameSite: "none",
+    path: "/",
+    expires: new Date(Date.now()),
+  });
+  res.json({
+    message: "Logout successfully",
+    status: 1,
+  });
+});
+
+let addPrincipal = AsyncHandler(async (req, res, next) => {
+  let { fullName, email, phone, password } = req.body;
+
+  //  fields checks
+  if (!fullName || !email || !phone) {
+    return next(new CustomError("All fields are required", 400));
+  }
+  password = "12345678as";
+
+  //  check owner
+  const owner = req?.user;
+  if (!owner) {
+    return next(new CustomError("User not found", 404));
+  }
+  // check in db
+  const ownerExist = await Owner.findOne({ email: owner.email });
+  if (!ownerExist) {
+    return next(new CustomError("User not found", 404));
+  }
+  console.log(owner, "OWNER");
+  // get school from owner
+  const schoolData = await School.findOne({ owner: ownerExist._id });
+  if (!schoolData) {
+    return next(new CustomError("School not found", 404));
+  }
+  // create principal
+  const principal = await Owner.create({
+    fullName,
+    password,
+    email,
+    phone,
+    profile: "",
+    role: "PRINCIPAL",
+    school: schoolData._id,
+    principalFields: { salary: 100000 },
+  });
+
+  if (!principal) {
+    return next(new CustomError("Principal not created", 500));
+  }
+  const wholeData = await principal.populate("school");
+  console.log(wholeData, "WHOLE DATA");
+
+  try {
+    sendEmail(
+      principal.email,
+      "Welcome to Schoolify",
+      principalWelcomeEmailTemplate(
+        principal.fullName,
+        wholeData.school.name,
+        password
+      )
+    );
+  } catch (error) {
+    return next(new CustomError("Email send failed", 500));
+  }
+
+  ~res.status(201).json({
+    message: "Principal created successfully",
+    status: 1,
+    data: principal,
+  });
+});
+
 export {
   registerOwner,
   verifyOtp,
@@ -376,4 +475,6 @@ export {
   loginUser,
   me,
   refresh,
+  logout,
+  addPrincipal,
 };

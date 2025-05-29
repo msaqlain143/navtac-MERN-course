@@ -40,10 +40,56 @@ const ownerSchema = new Schema(
     plan: {
       type: String,
       default: "free",
+      required: false,
     },
     refreshToken: {
       type: String,
       default: null,
+    },
+    school: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "school",
+    },
+    role: {
+      type: String,
+      enum: ["OWNER", "PRINCIPAL", "TEACHER", "STUDENT"],
+      default: "OWNER",
+    },
+    principalFields: {
+      joinDate: {
+        type: Date,
+        default: Date.now(),
+      },
+      salary: {
+        type: Number,
+        required: function () {
+          return this.role === "PRINCIPAL";
+        },
+      },
+    },
+    teacherFields: {
+      joinDate: {
+        type: Date,
+        default: Date.now(),
+      },
+      salary: {
+        type: Number,
+        required: function () {
+          return this.role === "TEACHER";
+        },
+      },
+    },
+    studentFields: {
+      joinDate: {
+        type: Date,
+        default: Date.now(),
+      },
+      class: {
+        type: String,
+        required: function () {
+          return this.role === "STUDENT";
+        },
+      },
     },
   },
   { timestamps: true }
@@ -51,7 +97,7 @@ const ownerSchema = new Schema(
 
 ownerSchema.pre("save", async function () {
   if (!this.isModified("password")) {
-    next();
+    return;
   }
   try {
     const salt = await bcrypt.genSalt(10);
@@ -73,7 +119,7 @@ ownerSchema.methods.comparePassword = async function (password) {
 // generate jwt token
 ownerSchema.methods.generateToken = function () {
   return jwt.sign(
-    { id: this._id, email: this.email },
+    { id: this._id, email: this.email, role: this.role },
     process.env.JWT_SECRET_KEY,
     {
       expiresIn: process.env.JWT_EXPIRATION_TIME,
