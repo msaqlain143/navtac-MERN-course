@@ -41,8 +41,25 @@ const LoginForm = () => {
             user: res?.data?.data?.user,
           };
         });
+        console.log(res, "response");
         localStorage.setItem("persist", true);
-        navigate("/owner/dashboard");
+        //navigate("/owner/dashboard");
+        switch (res?.data?.data?.user?.role) {
+          case "OWNER":
+            navigate("/owner/dashboard");
+            break;
+          case "PRINCIPAL":
+            navigate("/principal/dashboard");
+            break;
+          case "TEACHER":
+            navigate("/teacher/dashboard");
+            break;
+          case "STUDENT":
+            navigate("/student/dashboard");
+            break;
+          default:
+            navigate("/auth/login");
+        }
       }
     } catch (error) {
       console.log(error);

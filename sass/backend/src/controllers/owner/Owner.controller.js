@@ -354,6 +354,7 @@ const refresh = AsyncHandler(async (req, res, next) => {
       message: "Token refreesh successfully ..",
       status: 1,
       accessToken: newAccessToken,
+      data: isValidRefreshToken,
     });
   } catch (error) {
     res.clearCookie("refresh", {
